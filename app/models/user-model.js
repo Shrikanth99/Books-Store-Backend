@@ -10,6 +10,12 @@ const userSchema = new Schema({
         type : String,
         enum : ['admin','moderator','user'],
         default : 'user'
+    },
+    verified: {
+        type: Boolean,
+        default: function () {
+            return this.role === 'customer' ? false : true
+        }
     }
 },{timestamps:true})
 

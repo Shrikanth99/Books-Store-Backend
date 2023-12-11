@@ -4,6 +4,8 @@ const { validationResult } = require('express-validator')
 const bcryptjs = require('bcryptjs')
 const _ = require('lodash')
 
+const transporter = require('../../config/nodemailer')
+
 const usersCltr = {} 
 
 usersCltr.register = async (req,res) => {
@@ -29,13 +31,55 @@ usersCltr.register = async (req,res) => {
         if( totalUser == 0 ){
             user.role = 'admin'
         }
-        await user.save()
-        res.json(user)
+        const usr = await user.save()
+        if(usr){
+            const token = jwt.sign({id: usr._id, role : usr.role },process.env.JWT_SECRET)
+            const verificationLink = `http://localhost:3055/api/users/verify/${token}`
+
+            const mailOptions = {
+                from: process.env.NODE_MAILER_MAIL, // Sender email
+                to: user.email || 'shrikanthshivangi@gmail.com' && "nishanbangera4321@gmail.com",  // Newly registered user's email
+                subject: 'Email Verification',
+                html: `
+                    <p>Hello,</p>
+                    <p>Thank you for registering! Please click the following link to verify your email:</p>
+                    <a href="${verificationLink}">Verify Email</a>
+                    <p>Best regards,</p>
+                `
+            }
+            await transporter.sendMail(mailOptions)
+            res.json({
+                usr : usr,
+                msg : `${usr.userName}, Please Verify your email send to your email address to access your account`
+            })
+        }
+        //res.json(user)
 
     } catch (e) {
        res.status(500).json(e) 
     }
 
+}
+
+usersCltr.verify = async(req,res) => {
+    const token = req.params.token
+
+    try {
+        const verifyToken = jwt.verify(token,process.env.JWT_SECRET)
+        
+        const user = await User.findOne({ _id: verifyToken.id })
+        if( user.verified == false ){
+            user.verified = !user.verified
+            const verified = await user.save()
+            if(verified){
+                res.json("Thankyou for registering with us.... Your account has been successfully verified.Please login to continue")
+            } else {
+                res.json({ msg: "Your account has already been verified....Please login to continue" })
+            }
+        }
+    } catch (e) {
+        res.status(500).json(e)
+    }
 }
 
 usersCltr.login = async(req,res) => {
