@@ -33,6 +33,7 @@ const upload = multer()
 //user routes
 app.post('/api/register', checkSchema(userRegisterValidationSchema) , usersCltr.register )
 app.post('/api/login', checkSchema(userLoginValidationSchema) , usersCltr.login )
+app.get('/api/users/verify/:token', usersCltr.verify)
 app.get('/api/users/profile', authenticateUser , usersCltr.profile  )
 app.get( '/api/list-all' , authenticateUser, authorizeUser(['admin']), usersCltr.listAll )
 app.get('/api/list-all-users', authenticateUser, authorizeUser(['admin']) ,usersCltr.listUsers )
