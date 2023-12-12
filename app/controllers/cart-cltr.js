@@ -19,7 +19,8 @@ cartCltr.create = async (req, res) => {
                 cart.products.push({ productId: req.params.id, quantity: 1 })
             }
             await cart.save()
-            res.json(cart)
+            const response = await Cart.findOne({userId: req.user.id}).populate('products.productId')
+            res.json(response)
         }
         else {
             const cartItem = {
@@ -32,7 +33,9 @@ cartCltr.create = async (req, res) => {
                 ]
             }
             const newCart = new Cart(cartItem)
-            const response = await newCart.save()
+             await newCart.save()
+            const response = await Cart.findOne({userId: req.user.id}).populate('products.productId')
+            // console.log(response)
             res.json(response)
         }
 
@@ -45,8 +48,15 @@ cartCltr.create = async (req, res) => {
 
 cartCltr.list = async(req,res) =>{
     try{
-        const cart = await Cart.findOne({userId: req.user.id})
-        res.json(cart)
+        const cart = await Cart.findOne({userId: req.user.id}).populate('products.productId')
+        console.log(cart)
+        if(cart){
+            res.json(_.pick(cart,['products']))
+        }
+        else{
+            res.json([])
+        }
+        
     }
     catch(e){
         res.status(500).json(e.message)
@@ -55,26 +65,28 @@ cartCltr.list = async(req,res) =>{
 
 cartCltr.removeQuantity = async(req,res) =>{
     try{
-
         const cart = await Cart.findOne({ userId: req.user.id })
         if(cart){
             const existingProductIndex = cart.products.findIndex(product=>{
-                return product._id == req.params.id
+                return product.productId == req.params.id
             })
             if(existingProductIndex != -1){
                 if(cart.products[existingProductIndex].quantity == 1 && cart.products.length > 1){
                     cart.products.splice(existingProductIndex,1)
                     await cart.save()
-                    res.json(cart)
+                    const response = await Cart.findOne({userId: req.user.id}).populate('products.productId')
+                    res.json(response)
                 }
                 else if(cart.products[existingProductIndex].quantity == 1 && cart.products.length == 1){
                     const cartItem = await Cart.findOneAndDelete({userId:req.user.id})
-                    res.json(cartItem)
+                    const response = await Cart.findOne({userId: req.user.id}).populate('products.productId')
+                    res.json(response)
                 }
                 else{
                     cart.products[existingProductIndex].quantity -= 1
                     await cart.save()
-                    res.json(cart)
+                    const response = await Cart.findOne({userId: req.user.id}).populate('products.productId')
+                    res.json(response)
                 }
             }
             else{

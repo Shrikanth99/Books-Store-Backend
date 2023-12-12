@@ -38,6 +38,14 @@ usersCltr.register = async (req,res) => {
 
 }
 
+// usersCltr.verify = async(req,res) => {
+//     try {
+//         const user = await User.f
+//     } catch (e) {
+        
+//     }
+// }
+
 usersCltr.login = async(req,res) => {
     const errors = validationResult(req)
     if( !errors.isEmpty() ){
