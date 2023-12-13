@@ -92,7 +92,14 @@ const userLoginValidationSchema = {
     password : passwordSchema
 }
 
+const updateProfileValidationSchema = {
+    userName : userNameSchema,
+    email : emailLoginSchema,
+    password : passwordSchema
+}
+
 module.exports = {
     userRegisterValidationSchema,
-    userLoginValidationSchema
+    userLoginValidationSchema,
+    updateProfileValidationSchema
 }

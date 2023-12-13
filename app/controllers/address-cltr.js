@@ -41,7 +41,7 @@ addressCltr.update = async(req,res) => {
             res.json(address)
         }
     } catch (e) {
-        
+        res.status(500).json(e)
     }
 }
 

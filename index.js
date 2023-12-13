@@ -5,11 +5,13 @@ const cors = require('cors')
 const app = express()
 const port = process.env.PORT || 3055
 const multer = require('multer')
-const {userRegisterValidationSchema,userLoginValidationSchema} = require('./app/helpers/userValidationSchema')
+const {userRegisterValidationSchema,userLoginValidationSchema,updateProfileValidationSchema} = require('./app/helpers/userValidationSchema')
 const categoryValidationSchema = require('./app/helpers/categoryValidationSchema')
 const {checkSchema} = require('express-validator')
 const addressValidationSchema = require('./app/helpers/addressValidationSchema')
 const reviewValidationSchema = require('./app/helpers/reviewValidationSchema')
+
+// controllers
 const usersCltr = require('./app/controllers/users-cltr')
 const addressCltr = require('./app/controllers/address-cltr')
 const categoryCltr = require('./app/controllers/category-cltr')
@@ -37,6 +39,8 @@ app.get('/api/users/verify/:token', usersCltr.verify)
 app.get('/api/users/profile', authenticateUser , usersCltr.profile  )
 app.get( '/api/list-all' , authenticateUser, authorizeUser(['admin']), usersCltr.listAll )
 app.get('/api/list-all-users', authenticateUser, authorizeUser(['admin']) ,usersCltr.listUsers )
+// update profile
+app.put('/api/user/update-profile/:id', checkSchema(updateProfileValidationSchema) ,authenticateUser,authorizeUser(['user']), usersCltr.updateProfile)
 app.put('/api/user/:id/change-role', authenticateUser, authorizeUser(['admin']), usersCltr.changeRole)
 app.delete('/api/user/:id', authenticateUser ,authorizeUser(['admin']) , usersCltr.removeUser )
 app.delete('/api/user-acc/:id', authenticateUser , usersCltr.deleteAccount )

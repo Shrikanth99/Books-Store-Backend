@@ -169,6 +169,33 @@ usersCltr.removeUser = async(req,res) => {
     }
 }
 
+usersCltr.updateProfile = async(req,res) => {
+    const id = req.params.id
+
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        return res.status(400).json({ errors : errors.array() })
+    }
+
+    const body = _.pick(req.body,['userName','email','phoneNumber','password'])
+
+    try {
+        if(req.user.id == id){
+            const usr = await User.findOneAndUpdate({ _id : id }, body, {new:true})
+            const salt = await bcryptjs.genSalt()
+            const hashedPassword = await bcryptjs.hash(usr.password,salt)
+            usr.password = hashedPassword
+            usr.save()
+            res.json(usr)
+        } else {
+            res.status(401).json({ errors : [ { msg : 'Unauthorized' } ] })
+        }
+    } catch (e) {
+        res.status(500).json(e)
+    }
+
+}
+
 usersCltr.deleteAccount = async(req,res) => {
     const id = req.params.id
     try {
