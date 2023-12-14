@@ -77,6 +77,7 @@ app.delete('/product/cart/removeAll',authenticateUser,authorizeUser(['user']),ca
 
 //wishlist routes
 app.post('/product/wishlist/:productId',authenticateUser,authorizeUser(['user']),wishlistCltr.create)
+app.get('/product/wishlist/list',authenticateUser,authorizeUser(['user']),wishlistCltr.list)
 app.delete('/product/wishlist/:wishlistId',authenticateUser,authorizeUser(['user']),wishlistCltr.delete)
 
 app.listen(port,()=>{

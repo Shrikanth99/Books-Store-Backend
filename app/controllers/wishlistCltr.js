@@ -7,22 +7,34 @@ wishlistCltr.create = async (req, res) => {
     try {
         const { productId } = req.params
         const userId = req.user.id
-
         const existingWishlistItem = await Wishlist.findOne({product:productId,user:userId})
         if (existingWishlistItem) {
-            return res.status(400).json({ message: 'Product already in wishlist' });
+
+            return res.status(201).json({ message: 'Product already in wishlist' });
           }
 
           const newWishlistItem = new Wishlist({
             product: productId,
             user: userId,
           });
-          await newWishlistItem.save();
-      
-          res.status(201).json({ message: 'Product added to wishlist successfully' });
+          const wishlistItem = await newWishlistItem.save();
+          res.status(201).json({ message: 'Product added to wishlist successfully',
+            wishlistItem
+        });
 
     }
     catch (e) {
+        res.status(500).json(e)
+    }
+}
+
+wishlistCltr.list = async(req,res) =>{
+    try{
+        const {id} = req.user
+        const items = await Wishlist.find({user:id})
+        res.json(items)
+    }
+    catch(e){
         res.status(500).json(e)
     }
 }
