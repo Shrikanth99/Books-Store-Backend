@@ -1,3 +1,5 @@
+const Address = require('../models/address-model')
+
 const addressValidationSchema = {
     userId:{
         isMongoId:{
@@ -25,6 +27,16 @@ const addressValidationSchema = {
     houseNumber:{
         notEmpty:{
             errorMessage:'house Number is required'
+        },
+        custom : {
+            options : async(value) => {
+                const houseNumber = await Address.findOne({ houseNumber : value })
+                if(houseNumber){
+                    throw new Error('Same house no is already used')
+                } else {
+                    return true
+                }
+            }
         }
     },
     address:{

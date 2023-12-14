@@ -8,21 +8,22 @@ addressCltr.create = async(req,res) =>{
     if(!errors.isEmpty()){
         return res.status(400).json({errors:errors.array()})
     }
-    const body = _.pick(req.body,['firstName','lastName','phoneNumber','houseNumber','address','landMark','city','state','country','pinCode','addressType','defaultAdd'])
+    const body = _.pick(req.body,['fullName','phoneNumber','houseNumber','address','landMark','city','state','country','pincode','addressType','defaultAdd'])
     const address = new Address(body)
     address.userId = req.user.id
     try{
         await address.save()
-        console.log(address)
-        res.json({msg:'saved successfully',address})
+        //console.log(address)
+        res.json(address)
     }
     catch(e){
-        res.status(500).json(e)
+        res.status(500).json({errors:[{msg:err.message}]})
     }
 }
 
 addressCltr.list = async(req,res) =>{
     const id = req.user.id
+    //console.log(id)
     try{
         const address = await Address.find({userId:id})
         res.json(address)

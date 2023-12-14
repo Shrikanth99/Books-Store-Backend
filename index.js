@@ -46,7 +46,7 @@ app.delete('/api/user/:id', authenticateUser ,authorizeUser(['admin']) , usersCl
 app.delete('/api/user-acc/:id', authenticateUser , usersCltr.deleteAccount )
 
 //address routes
-app.post('/address',checkSchema(addressValidationSchema),authenticateUser,addressCltr.create)
+app.post('/address',checkSchema(addressValidationSchema),authenticateUser,authorizeUser(['user']),addressCltr.create)
 app.get('/address',authenticateUser,addressCltr.list)
 app.put('/address/:id',authenticateUser,addressCltr.update)
 app.delete('/address/:id',authenticateUser,addressCltr.remove)

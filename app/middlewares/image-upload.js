@@ -27,7 +27,7 @@ async function deleteFromS3(key) {
  
     try {
        await s3.deleteObject(params).promise();
-       console.log("image deleted");
+       //console.log("image deleted");
        return true
     } catch (error) {
        return false

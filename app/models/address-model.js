@@ -14,7 +14,7 @@ const addressSchema = new Schema({
     city: String,
     state: String,
     country: String,
-    pinCode: Number,
+    pincode: Number,
     addressType:{
         type: String,
         enum: ['Home','Office'],

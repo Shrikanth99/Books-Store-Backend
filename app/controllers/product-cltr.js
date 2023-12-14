@@ -23,7 +23,7 @@ productCltr.create = async(req,res) => {
     
     const body = _.pick(req.body, ['title', 'author', 'image', 'description', 'price' , 'categoryId', 'condition', 'ratings' , 'stockCount' ])
     const filesData = req.files //using multer for file upload
-    console.log(filesData)
+    //console.log(filesData)
     let images = []
     //uploading to AWS
     
@@ -31,7 +31,7 @@ productCltr.create = async(req,res) => {
     try {
         for(const file of filesData){
             const uploadResult = await uploadToS3(file)
-            console.log(uploadResult)
+            //console.log(uploadResult)
             images.push(uploadResult)
         }
         body.image = images
