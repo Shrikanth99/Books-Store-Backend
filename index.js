@@ -10,6 +10,7 @@ const categoryValidationSchema = require('./app/helpers/categoryValidationSchema
 const {checkSchema} = require('express-validator')
 const addressValidationSchema = require('./app/helpers/addressValidationSchema')
 const reviewValidationSchema = require('./app/helpers/reviewValidationSchema')
+const orderValidationschema = require('./app/helpers/orderValidationSchema')
 
 // controllers
 const usersCltr = require('./app/controllers/users-cltr')
@@ -18,11 +19,13 @@ const categoryCltr = require('./app/controllers/category-cltr')
 const reviewCltr = require('./app/controllers/review-cltr')
 const productCltr = require('./app/controllers/product-cltr')
 const cartCltr = require('./app/controllers/cart-cltr')
+const orderCltr = require('./app/controllers/order-cltr')
 
 const {authenticateUser,authorizeUser} = require('./app/middlewares/authentication')
 
 const configureDb = require('./config/db')
 const wishlistCltr = require('./app/controllers/wishlistCltr')
+const paymentCltr = require('./app/controllers/paymentCltr')
 configureDb()
 
 app.use(express.json())
@@ -32,6 +35,8 @@ app.use(express.urlencoded({extended: true}))
 app.use('/uploads', express.static('uploads'))
 
 const upload = multer()
+
+
 //user routes
 app.post('/api/register', checkSchema(userRegisterValidationSchema) , usersCltr.register )
 app.post('/api/login', checkSchema(userLoginValidationSchema) , usersCltr.login )
@@ -53,18 +58,19 @@ app.delete('/address/:id',authenticateUser,addressCltr.remove)
 
 //category routes
 app.post('/categories', checkSchema(categoryValidationSchema), authenticateUser, authorizeUser(['admin']) , categoryCltr.create )
-app.get('/categories', authenticateUser, categoryCltr.list )
+app.get('/categories/list',  categoryCltr.list )
 app.delete('/categories/:id', authenticateUser , authorizeUser(['admin']) , categoryCltr.destroy )
 
 //product routes
-app.post('/product/:id',authenticateUser,authorizeUser(['admin']),upload.array('image'),productCltr.create)
+app.post('/product',authenticateUser,authorizeUser(['admin']),upload.array('image'),productCltr.create)
 app.get('/product',productCltr.list)
 app.put('/product/:id',authenticateUser,authorizeUser(['admin']),productCltr.update)
 app.delete('/product/:id',authenticateUser,authorizeUser(['admin']),productCltr.delete)
 
 //review Routes
-app.post('/product/review/:id',checkSchema(reviewValidationSchema),authenticateUser,authorizeUser(['user']),reviewCltr.create)
-app.get('/product/review',authenticateUser,reviewCltr.list)
+app.post('/product/review',checkSchema(reviewValidationSchema),authenticateUser,authorizeUser(['user']),reviewCltr.create)
+app.get('/product/review/:id',reviewCltr.list)
+app.get('/product/user/review/',authenticateUser,reviewCltr.listUserReview)
 app.put('/product/review/:id',authenticateUser,checkSchema(reviewValidationSchema),authorizeUser(['user']),reviewCltr.update)
 app.delete('/product/:pId/review/:rId',authenticateUser,authorizeUser(['user','admin']),reviewCltr.delete)
 
@@ -80,6 +86,17 @@ app.post('/product/wishlist/:productId',authenticateUser,authorizeUser(['user'])
 app.get('/product/wishlist/list',authenticateUser,authorizeUser(['user']),wishlistCltr.list)
 app.delete('/product/wishlist/:wishlistId',authenticateUser,authorizeUser(['user']),wishlistCltr.delete)
 
+//payments
+app.post('/payment/create',authenticateUser,authorizeUser(['user']),paymentCltr.create)
+app.put('/payment/update/:id',authenticateUser,authorizeUser(['user']),paymentCltr.update)
+app.delete('/payment/delete/:id',authenticateUser,authorizeUser(['user']),paymentCltr.delete)
+app.get('/payment/list',authenticateUser,authorizeUser(['user']),paymentCltr.list)
+
+// order Routes
+app.post('/order/create',checkSchema(orderValidationschema),authenticateUser,authorizeUser(['user']),orderCltr.create)
+app.get('/order/list',authenticateUser,authorizeUser(['user']),orderCltr.list)
+
+// server 
 app.listen(port,()=>{
     console.log('server listening to the port',port)
 })

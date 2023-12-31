@@ -14,6 +14,10 @@ const productSchema = new Schema({
         type : Schema.Types.ObjectId,
         ref : 'Category'
     },
+    condition : {
+        type : String,
+        enum : ['Good','Fair']
+    },
     ratings : Number,
     stockCount : {
         type : Number,

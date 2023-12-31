@@ -8,7 +8,7 @@ const configureDb = async() =>{
         console.log(`connected to the book-store database`)
     }
     catch(e){
-        console.log('error connecting to the db',e.message)
+        console.log('error connecting to the db',e)
     }
 }
 

@@ -6,16 +6,31 @@ const orderSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
+    address : {
+        type:Schema.Types.ObjectId,
+        ref : 'Address'
+    },
+    orderItem : [
+        {
+            product : {
+                type : Schema.Types.ObjectId,
+                ref: 'Product'
+            },
+            quantity : Number
+        }
+    ],
+    totalAmount : Number,
     payment: {
         type: Schema.Types.ObjectId,
         ref: 'Payment'
     },
-    status:{
+    orderStatus:{
         type: String,
-        enum:["Not Process", "Processing","Shipped","Delivered","Cancel"]
-    }
-
-})
+        enum:[ "Processing","Shipped","Delivered","Cancel"]
+    },
+    orderDate : Date,
+    expectedDeliveryDate : Date
+},{timestamps:true})
 
 const Order = model('Order', orderSchema)
 module.exports = Order

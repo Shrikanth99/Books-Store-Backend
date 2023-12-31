@@ -19,13 +19,13 @@ const paymentSchema = new Schema({
   totalAmount: Number,
   paymentMethod: {
     type: String,
-    enum: ['Credit Card', 'PayPal', 'Other']
+    enum: ['Card']
   },
   transactionId: String,
+  userEmail : String,
   status: {
     type: String,
-    enum: ['Pending', 'Completed', 'Failed'],
-    default: 'Pending',
+    default: 'pending',
   },
 }, { timestamps: true });
 
