@@ -15,6 +15,17 @@ const addressSchema = new Schema({
     state: String,
     country: String,
     pincode: Number,
+    location:{
+        type:{
+            type:String,
+            required:true,
+            default:'Point'
+        },
+        coordinates: {      
+            required:true,
+            type:[Number]       //geospatial data
+        }
+    }, 
     addressType:{
         type: String,
         enum: ['Home','Office'],

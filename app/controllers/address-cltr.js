@@ -1,6 +1,7 @@
 const Address = require('../models/address-model')
 const {validationResult} = require('express-validator')
 const _ = require('lodash')
+const axios = require('axios')
 const addressCltr = {}
 
 addressCltr.create = async(req,res) =>{
@@ -8,16 +9,26 @@ addressCltr.create = async(req,res) =>{
     if(!errors.isEmpty()){
         return res.status(400).json({errors:errors.array()})
     }
-    const body = _.pick(req.body,['fullName','phoneNumber','houseNumber','address','landMark','city','state','country','pincode','addressType','defaultAdd'])
+    const body = _.pick(req.body,['fullName','phoneNumber','houseNumber','address','landMark','city','state','country','pincode','addressType','defaultAdd','userId'])
+    const searchString = `${body.houseNumber}%2C%20${body.landMark}%2C%20${body.pincode}%2C%20${body.city}%2C%20${body.state}%2C%20${body.country}`
     const address = new Address(body)
-    address.userId = req.user.id
+    // if(req.user?.id){
+    //     address.userId = req.user.id
+    // }
     try{
+        const  mapResponse =  await axios.get(`https://api.geoapify.com/v1/geocode/search?text=${searchString}&apiKey=${process.env.GEOAPIFYKEY}`)
+        if(mapResponse.data.features.length==0){
+           return  res.status(400).json({errors:[{msg:"Invalid address",path:'invalid address'}]})
+        }
+        const location = [mapResponse.data.features[0].properties.lon,mapResponse.data.features[0].properties.lat]
+        console.log('ghj',location)
+        address.location = {type:'Point',coordinates:location}
         await address.save()
         //console.log(address)
         res.json(address)
     }
     catch(e){
-        res.status(500).json({errors:[{msg:err.message}]})
+        res.status(500).json({errors:[{msg:e.message}]})
     }
 }
 

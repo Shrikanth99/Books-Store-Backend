@@ -26,6 +26,7 @@ const {authenticateUser,authorizeUser} = require('./app/middlewares/authenticati
 const configureDb = require('./config/db')
 const wishlistCltr = require('./app/controllers/wishlistCltr')
 const paymentCltr = require('./app/controllers/paymentCltr')
+const procurementCltr = require('./app/controllers/procurement-cltr')
 configureDb()
 
 app.use(express.json())
@@ -52,9 +53,10 @@ app.delete('/api/user-acc/:id', authenticateUser , usersCltr.deleteAccount )
 
 //address routes
 app.post('/address',checkSchema(addressValidationSchema),authenticateUser,authorizeUser(['user']),addressCltr.create)
+app.post('/address/create',checkSchema(addressValidationSchema),addressCltr.create)
 app.get('/address',authenticateUser,addressCltr.list)
 app.put('/address/:id',authenticateUser,addressCltr.update)
-app.delete('/address/:id',authenticateUser,addressCltr.remove)
+app.delete('/address/:id',authenticateUser,authorizeUser(['user']),addressCltr.remove)
 
 //category routes
 app.post('/categories', checkSchema(categoryValidationSchema), authenticateUser, authorizeUser(['admin']) , categoryCltr.create )
@@ -95,6 +97,11 @@ app.get('/payment/list',authenticateUser,authorizeUser(['user']),paymentCltr.lis
 // order Routes
 app.post('/order/create',checkSchema(orderValidationschema),authenticateUser,authorizeUser(['user']),orderCltr.create)
 app.get('/order/list',authenticateUser,authorizeUser(['user']),orderCltr.list)
+app.get('/order/listAll',authenticateUser,authorizeUser(['admin']),orderCltr.listAll)
+
+//procurement Routes
+app.post('/procurement/create',authenticateUser,authorizeUser(['user']),procurementCltr.create)
+// app.get('/procurement/list',authenticateUser,authorizeUser(['user']),procurementCltr.list)
 
 // server 
 app.listen(port,()=>{

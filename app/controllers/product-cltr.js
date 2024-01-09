@@ -53,14 +53,14 @@ productCltr.list = async(req,res) => {
       
             aggregationPipeline.push({ $sort: sortCriteria });
         }
-        console.log('aP',aggregationPipeline)
+        //console.log('aP',aggregationPipeline)
         if(aggregationPipeline.length > 0){
             const products = await Product.aggregate(aggregationPipeline )
-            console.log('q',products.length)
+            //console.log('q',products.length)
             res.json(products)
         }else  {
             const result = await Product.find()
-            console.log('res',result.length)
+            //console.log('res',result.length)
             res.json(result)
         }
 

@@ -7,12 +7,7 @@ const procurementSchema = new Schema({
             product: {
                 type: Schema.Types.ObjectId,
                 ref: 'Product',
-            },
-            condition : {
-                type : String,
-                enum : ['Good', 'Fair']
-            },
-            price: Number,
+            }
         },
     ],
     buyer: {
@@ -22,6 +17,10 @@ const procurementSchema = new Schema({
     seller:{
         type: Schema.Types.ObjectId,
         ref: 'User'
+    },
+    address : {
+        type:Schema.Types.ObjectId,
+        ref : 'Address'
     },
     totalCost: Number, 
     procurementDate: {

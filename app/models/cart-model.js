@@ -12,6 +12,7 @@ const cartSchema = new Schema({
                 type: Schema.Types.ObjectId,
                 ref:'Product'
             },
+            mode: String,
             quantity: Number
         }
     ]

@@ -1,6 +1,7 @@
 const _ = require('lodash')
 const { validationResult } = require('express-validator')
 const Order = require('../models/order-model')
+const Product = require('../models/product-model')
 
 const orderCltr = {}
 
@@ -34,6 +35,10 @@ orderCltr.create = async(req,res) =>{
         order.user = req.user.id
         order.orderDate = eD()
         order.expectedDeliveryDate = eD(7)
+        order.orderItem.forEach(async(ele) => {
+
+            await Product.findOneAndUpdate({_id :ele.product },{$inc: {stockCount : -ele.quantity }})
+        })
         const result = await order.save()
         res.json(result)
     } catch (e) {
@@ -44,6 +49,16 @@ orderCltr.create = async(req,res) =>{
 orderCltr.list = async(req,res) => {
     try {
         const order = await Order.find({user:req.user.id}).populate('orderItem.product').populate('payment',['status'])
+        res.json(order)
+    } catch (e) {
+        res.status(500).json(e)
+    }
+}
+
+orderCltr.listAll = async(req,res) => {
+    try {
+        const order = await Order.find().populate('orderItem.product')
+        console.log('ao',order)
         res.json(order)
     } catch (e) {
         res.status(500).json(e)
