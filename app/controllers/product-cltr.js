@@ -1,8 +1,10 @@
+const mongoose = require('mongoose')
 const { validationResult } = require('express-validator')
 const _ = require('lodash')
 const {uploadToS3} = require('../middlewares/image-upload')
 const Product = require('../models/product-model')
 const Category = require('../models/category-model')
+
 
 productCltr = {}
 
@@ -20,7 +22,7 @@ productCltr.list = async(req,res) => {
             }
         }
         if(categoryId){
-            matchCriteria.categoryId = categoryId
+            matchCriteria.categoryId = new mongoose.Types.ObjectId(categoryId)
         }
         
         const aggregationPipeline = []
@@ -56,7 +58,7 @@ productCltr.list = async(req,res) => {
         //console.log('aP',aggregationPipeline)
         if(aggregationPipeline.length > 0){
             const products = await Product.aggregate(aggregationPipeline )
-            //console.log('q',products.length)
+            console.log('q',products)
             res.json(products)
         }else  {
             const result = await Product.find()
@@ -68,6 +70,8 @@ productCltr.list = async(req,res) => {
         res.status(500).json(e)
     }
 }
+
+
 
 productCltr.create = async(req,res) => {
     const errors = validationResult(req)

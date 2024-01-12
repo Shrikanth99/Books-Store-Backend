@@ -7,7 +7,8 @@ const procurementSchema = new Schema({
             product: {
                 type: Schema.Types.ObjectId,
                 ref: 'Product',
-            }
+            },
+            quantity : Number
         },
     ],
     buyer: {
@@ -26,6 +27,11 @@ const procurementSchema = new Schema({
     procurementDate: {
         type: Date,
         default: Date.now,
+    },
+    status:{
+        type:String,
+        default: 'Pending',
+        enum: ['Pending','Procured']
     }
 }, { timestamps: true });
 

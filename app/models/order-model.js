@@ -26,7 +26,8 @@ const orderSchema = new Schema({
     },
     orderStatus:{
         type: String,
-        enum:[ "Processing","Shipped","Delivered","Cancel"]
+        enum:[ "Pending","Delivered"],
+        default:'Pending'
     },
     orderDate : Date,
     expectedDeliveryDate : Date

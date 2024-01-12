@@ -98,10 +98,14 @@ app.get('/payment/list',authenticateUser,authorizeUser(['user']),paymentCltr.lis
 app.post('/order/create',checkSchema(orderValidationschema),authenticateUser,authorizeUser(['user']),orderCltr.create)
 app.get('/order/list',authenticateUser,authorizeUser(['user']),orderCltr.list)
 app.get('/order/listAll',authenticateUser,authorizeUser(['admin']),orderCltr.listAll)
+app.delete('/order/delete/:id',authenticateUser,authorizeUser(['user']),orderCltr.removeOrder)
 
 //procurement Routes
+// app.get('/procurement/listAll',authenticateUser,authorizeUser(['admin']),procurementCltr.listAll )
+app.get('/procurement/list',authenticateUser,authorizeUser(['moderator','user','admin']),procurementCltr.list)
 app.post('/procurement/create',authenticateUser,authorizeUser(['user']),procurementCltr.create)
-// app.get('/procurement/list',authenticateUser,authorizeUser(['user']),procurementCltr.list)
+app.put('/procurement/update/:procurementId', authenticateUser, authorizeUser(['moderator']), procurementCltr.updateStatus )
+app.delete('/procurement/cancel/:procurementId', authenticateUser, authorizeUser(['user']), procurementCltr.cancel )
 
 // server 
 app.listen(port,()=>{

@@ -58,11 +58,22 @@ orderCltr.list = async(req,res) => {
 orderCltr.listAll = async(req,res) => {
     try {
         const order = await Order.find().populate('orderItem.product')
-        console.log('ao',order)
+        // console.log('ao',order)
         res.json(order)
     } catch (e) {
         res.status(500).json(e)
     }
 }
 
+orderCltr.removeOrder = async(req,res) =>{
+    try{
+        const order = await Order.findByIdAndDelete(req.params.id)
+        res.json(order)
+    }
+    catch(e){
+        res.status(500).json(e)
+    }
+}
+
 module.exports = orderCltr
+
