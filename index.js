@@ -23,6 +23,7 @@ const {authenticateUser,authorizeUser} = require('./app/middlewares/authenticati
 
 const configureDb = require('./config/db')
 const wishlistCltr = require('./app/controllers/wishlistCltr')
+const paymentCltr = require('./app/controllers/payment-cltr')
 configureDb()
 
 app.use(express.json())
@@ -79,6 +80,9 @@ app.delete('/product/cart/removeAll',authenticateUser,authorizeUser(['user']),ca
 app.post('/product/wishlist/:productId',authenticateUser,authorizeUser(['user']),wishlistCltr.create)
 app.get('/product/wishlist/list',authenticateUser,authorizeUser(['user']),wishlistCltr.list)
 app.delete('/product/wishlist/:wishlistId',authenticateUser,authorizeUser(['user']),wishlistCltr.delete)
+
+//payment routes
+app.post('/api/create-checkout-session',authenticateUser,authorizeUser(['user']),paymentCltr.create)
 
 app.listen(port,()=>{
     console.log('server listening to the port',port)

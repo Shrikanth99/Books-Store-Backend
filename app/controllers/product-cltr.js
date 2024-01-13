@@ -9,6 +9,7 @@ productCltr = {}
 productCltr.list = async(req,res) => {
     try {
         const products = await Product.find()
+        console.log('products',products)
         res.json(products)
     } catch (e) {
         res.status(500).json(e)
@@ -36,6 +37,9 @@ productCltr.create = async(req,res) => {
         }
         body.image = images
         const product = new Product(body)
+        if(product.condition === 'Fair'){
+            product.price = (product.price*50)/100
+        }
         await product.save()
         res.json(product)
     } catch (e) {

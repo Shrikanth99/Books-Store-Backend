@@ -12,20 +12,18 @@ const paymentSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Product',
       },
-      quantity: Number,
-      price: Number
+      quantity: Number
     }
   ],
   totalAmount: Number,
   paymentMethod: {
     type: String,
-    enum: ['Credit Card', 'PayPal', 'Other']
+    enum: ['Credit Card']
   },
   transactionId: String,
   status: {
     type: String,
-    enum: ['Pending', 'Completed', 'Failed'],
-    default: 'Pending',
+    default: 'Pending'
   },
 }, { timestamps: true });
 

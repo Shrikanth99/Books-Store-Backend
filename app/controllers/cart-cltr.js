@@ -48,10 +48,10 @@ cartCltr.create = async (req, res) => {
 
 cartCltr.list = async(req,res) =>{
     try{
+       
         const cart = await Cart.findOne({userId: req.user.id}).populate('products.productId')
-        //console.log(cart)
         if(cart){
-            res.json(_.pick(cart,['products']))
+            res.json(cart)
         }
         else{
             res.json([])
