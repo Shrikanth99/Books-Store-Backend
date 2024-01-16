@@ -133,6 +133,17 @@ productCltr.delete = async(req,res) => {
     }
 }
 
+// productCltr.newArrival = async(req,res) => {
+    
+//     try{
+//         const product = await Product.find()
+//         const newProducts = product.slice((90*product.length)/100)
+//         res.json(newProducts)
+//     } catch(e) {
+//         res.status(500).json(e)
+//     }
+// }
+
 module.exports = productCltr
 
 
