@@ -11,11 +11,16 @@ addressCltr.create = async(req,res) =>{
     }
     const body = _.pick(req.body,['fullName','phoneNumber','houseNumber','address','landMark','city','state','country','pincode','addressType','defaultAdd','userId'])
     const searchString = `${body.houseNumber}%2C%20${body.landMark}%2C%20${body.pincode}%2C%20${body.city}%2C%20${body.state}%2C%20${body.country}`
+    
     const address = new Address(body)
     // if(req.user?.id){
     //     address.userId = req.user.id
     // }
     try{
+        const addresses = await Address.countDocuments({userId:req.user.id})
+        if(addresses == 3){
+            return res.status(400).json({errors:[{msg:'Cant create more than 3 addresses'}]})
+        }
         const  mapResponse =  await axios.get(`https://api.geoapify.com/v1/geocode/search?text=${searchString}&apiKey=${process.env.GEOAPIFYKEY}`)
         if(mapResponse.data.features.length==0){
            return  res.status(400).json({errors:[{msg:"Invalid address",path:'invalid address'}]})

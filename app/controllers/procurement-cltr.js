@@ -1,5 +1,6 @@
 const Procurement = require('../models/procurement-model')
 const Address = require('../models/address-model')
+const Product = require('../models/product-model')
 const _ = require('lodash')
 const transporter = require('../../config/nodemailer')
 
@@ -86,6 +87,9 @@ procurementCltr.updateStatus= async(req,res) => {
     const id = req.params.procurementId
     try{
         const procurement = await Procurement.findOneAndUpdate({ _id : id }, {status : 'Procured' },{new:true})
+        procurement.products.map(async(ele)=>{
+            await Product.findByIdAndUpdate(ele.product,{$inc: {stockCount : ele.quantity }})
+        })
         res.json(procurement)
     } catch(e){
         res.status(500).json(e)
