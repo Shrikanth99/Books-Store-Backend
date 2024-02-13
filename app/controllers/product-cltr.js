@@ -9,7 +9,8 @@ const Category = require('../models/category-model')
 productCltr = {}
 
 productCltr.list = async(req,res) => {
-    const {search,categoryId,sort} = req.query
+    const {search,categoryId,sort,page} = req.query
+    const limit = 8
     console.log('search',search,'cat',categoryId,'sort',sort)
     try {
         let matchCriteria ={}
@@ -61,7 +62,7 @@ productCltr.list = async(req,res) => {
             console.log('q',products)
             res.json(products)
         }else  {
-            const result = await Product.find()
+            const result = await Product.find().skip((page-1)*limit).limit(limit)
             //console.log('res',result.length)
             res.json(result)
         }
@@ -71,7 +72,14 @@ productCltr.list = async(req,res) => {
     }
 }
 
-
+productCltr.allProducts = async(req,res) => {
+    try {
+        const allProducts = await Product.find()
+        res.json(allProducts)
+    } catch (e) {
+        res.status(500).json(e)
+    }
+}
 
 productCltr.create = async(req,res) => {
     const errors = validationResult(req)
@@ -131,6 +139,17 @@ productCltr.delete = async(req,res) => {
         res.status(500).json(e)
     }
 }
+
+// productCltr.newArrival = async(req,res) => {
+    
+//     try{
+//         const product = await Product.find()
+//         const newProducts = product.slice((90*product.length)/100)
+//         res.json(newProducts)
+//     } catch(e) {
+//         res.status(500).json(e)
+//     }
+// }
 
 module.exports = productCltr
 

@@ -181,11 +181,10 @@ usersCltr.updateProfile = async(req,res) => {
 
     try {
         if(req.user.id == id){
-            const usr = await User.findOneAndUpdate({ _id : id }, body, {new:true})
             const salt = await bcryptjs.genSalt()
-            const hashedPassword = await bcryptjs.hash(usr.password,salt)
-            usr.password = hashedPassword
-            usr.save()
+            const hashedPassword = await bcryptjs.hash(body.password,salt)
+            body.password = hashedPassword
+            const usr = await User.findOneAndUpdate({ _id : id }, body, {new:true})
             res.json(usr)
         } else {
             res.status(401).json({ errors : [ { msg : 'Unauthorized' } ] })

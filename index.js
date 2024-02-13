@@ -65,6 +65,8 @@ app.delete('/categories/:id', authenticateUser , authorizeUser(['admin']) , cate
 
 //product routes
 app.post('/product',authenticateUser,authorizeUser(['admin']),upload.array('image'),productCltr.create)
+// app.get('/product/newArrival',productCltr.newArrival)
+app.get('/product/all',productCltr.allProducts)
 app.get('/product',productCltr.list)
 app.put('/product/:id',authenticateUser,authorizeUser(['admin']),productCltr.update)
 app.delete('/product/:id',authenticateUser,authorizeUser(['admin']),productCltr.delete)

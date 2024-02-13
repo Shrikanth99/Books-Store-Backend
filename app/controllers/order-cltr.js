@@ -55,19 +55,29 @@ orderCltr.list = async(req,res) => {
     }
 }
 
-orderCltr.listAll = async(req,res) => {
-    try {
-        const order = await Order.find().populate('orderItem.product')
-        // console.log('ao',order)
-        res.json(order)
-    } catch (e) {
-        res.status(500).json(e)
+    orderCltr.listAll = async(req,res) => {
+        const {sort} = req.query
+        try {
+            if(sort){
+                const order = await Order.find().populate('orderItem.product').sort({createdAt:Number(sort)})
+                res.json(order)
+            }else {
+                const order = await Order.find().populate('orderItem.product')
+                res.json(order)
+            }
+            
+            // console.log('ao',order)
+        } catch (e) {
+            res.status(500).json(e)
+        }
     }
-}
 
 orderCltr.removeOrder = async(req,res) =>{
     try{
         const order = await Order.findByIdAndDelete(req.params.id)
+        order.orderItem.forEach(async(ele) => {
+            await Product.findByIdAndUpdate(ele.product,{$inc: {stockCount : ele.quantity }})
+        })
         res.json(order)
     }
     catch(e){
