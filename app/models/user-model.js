@@ -14,7 +14,7 @@ const userSchema = new Schema({
     verified: {
         type: Boolean,
         default: function () {
-            return this.role === 'customer' ? false : true
+            return this.role === 'user'|| this.role === 'moderator' ? false : true
         }
     }
 },{timestamps:true})

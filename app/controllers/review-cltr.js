@@ -8,10 +8,10 @@ reviewCltr.create = async(req,res) =>{
     if(!errors.isEmpty()){
         return res.status(400).json({errors:errors.array()})
     }
-    const body = _.pick(req.body,['rating','review'])
+    const body = _.pick(req.body,['rating','review','product'])
     const review = new Review(body)
     review.userId = req.user.id
-    review.product = req.params.id
+    
     try{
         await review.save()
         res.json(review)
@@ -24,10 +24,19 @@ reviewCltr.create = async(req,res) =>{
 reviewCltr.list = async(req,res) =>{
     try{
         const {id} = req.params
-        const reviews = await Review.find({product:id})
+        const reviews = await Review.find({product:id}).populate('userId',['userName'])
         res.json(reviews)
     }
     catch(e){
+        res.status(500).json(e)
+    }
+}
+
+reviewCltr.listUserReview = async(req,res) => {
+    try {
+        const reviews = await Review.find({userId:req.user.id})
+        res.json(reviews)
+    } catch (e) {
         res.status(500).json(e)
     }
 }

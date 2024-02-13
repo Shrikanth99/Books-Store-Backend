@@ -1,4 +1,15 @@
+
 const reviewValidationSchema = {
+    userId : {
+        isMongoIdisMongoId : {
+            errorMessage:"should be a valid mongoId"
+        }
+        // custom : {
+        //     options : (value) => {
+
+        //     }
+        // }
+    },
     rating : {
         notEmpty : {
             errorMessage : 'Ratings should not be empty'
@@ -8,7 +19,7 @@ const reviewValidationSchema = {
         },
           isInt : {
             options:{gt:0,lt:6},
-            errorMessage: 'rating should be between 0 to 6'
+            errorMessage: 'rating should be between 0 to 5'
         }
         // custom : {
         //     options : (value) => {

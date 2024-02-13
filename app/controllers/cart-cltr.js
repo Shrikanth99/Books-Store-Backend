@@ -1,4 +1,5 @@
 const Cart = require('../models/cart-model.js')
+const Product = require('../models/product-model.js')
 const _ = require('lodash')
 const cartCltr = {}
 
@@ -6,32 +7,44 @@ const cartCltr = {}
 cartCltr.create = async (req, res) => {
     try {
         const cart = await Cart.findOne({ userId: req.user.id })
+        const product = await Product.findById(req.params.id)
+        const {mode} = req.body
         if(cart) {
             const existingProductIndex = cart.products.findIndex((product) => {
-               return product.productId == req.params.id
- 
+               return product.productId == req.params.id && product.mode == mode
             })
 
-            if (existingProductIndex != -1) {
-                cart.products[existingProductIndex].quantity += 1
+            if (existingProductIndex != -1 && mode == 'buy') {
+                if( cart.products[existingProductIndex].quantity < product.stockCount){
+                    cart.products[existingProductIndex].quantity += 1
+                }else {
+                   return res.json({ msg : 'Product is Out of Quantity' })
+                }
             }   
+            else if(existingProductIndex != -1 && mode == 'sell'){
+                cart.products[existingProductIndex].quantity += 1
+            }
             else {
-                cart.products.push({ productId: req.params.id, quantity: 1 })
+                cart.products.push({ productId: req.params.id,mode:mode, quantity: 1 })
             }
             await cart.save()
             const response = await Cart.findOne({userId: req.user.id}).populate('products.productId')
             res.json(response)
         }
         else {
-            const cartItem = {
-                userId: req.user.id,
-                products: [
-                    {
-                        productId: req.params.id,
-                        quantity: 1
-                    }
-                ]
-            }
+            let cartItem
+                cartItem = {
+                    userId: req.user.id,
+                    products: [
+                        {
+                            productId: req.params.id,
+                            mode:mode,
+                            quantity: 1
+                            
+                        }
+                    ]
+             }
+            
             const newCart = new Cart(cartItem)
              await newCart.save()
             const response = await Cart.findOne({userId: req.user.id}).populate('products.productId')
@@ -41,7 +54,7 @@ cartCltr.create = async (req, res) => {
 
     }
     catch (e) {
-        console.log(e.message)
+        console.log('hola',e.message)
         res.status(500).json(e.message)
     }
 }
@@ -66,9 +79,11 @@ cartCltr.list = async(req,res) =>{
 cartCltr.removeQuantity = async(req,res) =>{
     try{
         const cart = await Cart.findOne({ userId: req.user.id })
+        const {mode} = req.query
+        console.log(mode,'lav')
         if(cart){
             const existingProductIndex = cart.products.findIndex(product=>{
-                return product.productId == req.params.id
+                return product.productId == req.params.id && product.mode == mode
             })
             if(existingProductIndex != -1){
                 if(cart.products[existingProductIndex].quantity == 1 && cart.products.length > 1){
@@ -105,9 +120,10 @@ cartCltr.removeItem = async(req,res) =>{
 
         // const removeItem = await Cart.findOneAndUpdate({userId:req.user.id},{$pull:{products:}},{new:true})
         const cart = await Cart.findOne({ userId: req.user.id })
+        const {mode} = req.body
         if(cart){
             const removeItem = cart.products.filter(product=>{
-                return product.productId != req.params.id
+                return product.productId != req.params.id && product.mode != mode
             })
             if(_.isEmpty(removeItem)){
                 const cartItem = await Cart.findOneAndDelete({userId:req.user.id})
@@ -126,8 +142,11 @@ cartCltr.removeItem = async(req,res) =>{
 }
 
 cartCltr.removeAll = async(req,res) =>{
+    //console.log('mode',req.query)
+    const {mode} = req.query
+    console.log('md',mode)
     try{
-        const cart = await Cart.findOneAndDelete({userId:req.user.id})
+        const cart = await Cart.findOneAndUpdate({userId:req.user.id },{$pull:{products:{ mode : mode }}},{new:true})
         res.json(cart)
     }
     catch(e){

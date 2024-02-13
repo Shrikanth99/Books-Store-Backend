@@ -8,11 +8,7 @@ const procurementSchema = new Schema({
                 type: Schema.Types.ObjectId,
                 ref: 'Product',
             },
-            condition : {
-                type : String,
-                enum : ['Good', 'Fair']
-            },
-            price: Number,
+            quantity : Number
         },
     ],
     buyer: {
@@ -23,10 +19,19 @@ const procurementSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
+    address : {
+        type:Schema.Types.ObjectId,
+        ref : 'Address'
+    },
     totalCost: Number, 
     procurementDate: {
         type: Date,
         default: Date.now,
+    },
+    status:{
+        type:String,
+        default: 'Pending',
+        enum: ['Pending','Procured']
     }
 }, { timestamps: true });
 

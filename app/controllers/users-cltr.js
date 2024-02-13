@@ -49,7 +49,7 @@ usersCltr.register = async (req,res) => {
             }
             await transporter.sendMail(mailOptions)
             res.json({
-                usr : usr,
+                usr,
                 msg : `${usr.userName}, Please Verify your email send to your email address to access your account`
             })
         }

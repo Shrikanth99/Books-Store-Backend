@@ -1,20 +1,77 @@
+const mongoose = require('mongoose')
 const { validationResult } = require('express-validator')
 const _ = require('lodash')
 const {uploadToS3} = require('../middlewares/image-upload')
 const Product = require('../models/product-model')
 const Category = require('../models/category-model')
 
+
 productCltr = {}
 
 productCltr.list = async(req,res) => {
+    const {search,categoryId,sort} = req.query
+    console.log('search',search,'cat',categoryId,'sort',sort)
     try {
-        const products = await Product.find()
-        console.log('products',products)
-        res.json(products)
+        let matchCriteria ={}
+        if(search){
+            matchCriteria = {
+                $or : [
+                    {title:{$regex:search, $options: 'i'}},
+                    {author:{$regex:search, $options: 'i'}}
+                ]
+            }
+        }
+        if(categoryId){
+            matchCriteria.categoryId = new mongoose.Types.ObjectId(categoryId)
+        }
+        
+        const aggregationPipeline = []
+
+        if (Object.keys(matchCriteria).length !== 0) {
+            aggregationPipeline.push({ $match: matchCriteria });
+        }
+
+        if (sort) {
+            let sortCriteria = {};
+      
+            switch (sort) {
+              case "lowest-highest":
+                sortCriteria = { price: 1 };
+                break;
+              case "highest-lowest":
+                sortCriteria = { price: -1 };
+                break;
+              case "a-z":
+                console.log('a-z')
+                sortCriteria = { title: 1 };
+                break;
+              case "z-a":
+                sortCriteria = { title: -1 };
+                break;
+              default:
+                sortCriteria = { title: 1 }; // Default to sorting by title asc
+                break;
+            }
+      
+            aggregationPipeline.push({ $sort: sortCriteria });
+        }
+        //console.log('aP',aggregationPipeline)
+        if(aggregationPipeline.length > 0){
+            const products = await Product.aggregate(aggregationPipeline )
+            console.log('q',products)
+            res.json(products)
+        }else  {
+            const result = await Product.find()
+            //console.log('res',result.length)
+            res.json(result)
+        }
+
     } catch (e) {
         res.status(500).json(e)
     }
 }
+
+
 
 productCltr.create = async(req,res) => {
     const errors = validationResult(req)
@@ -76,3 +133,27 @@ productCltr.delete = async(req,res) => {
 }
 
 module.exports = productCltr
+
+
+
+/*
+try {
+        if(search && categoryId){
+            if(sort){
+                const products = await Product 
+            }
+            const products = await Product.find({$or:[{title:{$regex:search,$options:'i'}},{author:{$regex:search,$options:'i'}}], categoryId:categoryId})
+            res.json(products)
+        }
+        else if(search){
+            const products = await Product.find({$or:[{title:{$regex:search,$options:'i'}},{author:{$regex:search,$options:'i'}}]})
+            res.json(products)
+        }
+        else{
+            const products = await Product.find()
+            res.json(products)
+        }
+    } catch (e) {
+        res.status(500).json(e)
+    }
+*/
