@@ -11,7 +11,7 @@ productCltr = {}
 productCltr.list = async(req,res) => {
     const {search,categoryId,sort,page} = req.query
     const limit = 8
-    console.log('search',search,'cat',categoryId,'sort',sort)
+    //console.log('search',search,'cat',categoryId,'sort',sort)
     try {
         let matchCriteria ={}
         if(search){
@@ -59,7 +59,7 @@ productCltr.list = async(req,res) => {
         //console.log('aP',aggregationPipeline)
         if(aggregationPipeline.length > 0){
             const products = await Product.aggregate(aggregationPipeline )
-            console.log('q',products)
+            //console.log('q',products)
             res.json(products)
         }else  {
             const result = await Product.find().skip((page-1)*limit).limit(limit)
