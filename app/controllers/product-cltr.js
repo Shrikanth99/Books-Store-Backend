@@ -58,8 +58,8 @@ productCltr.list = async(req,res) => {
         }
         //console.log('aP',aggregationPipeline)
         if(aggregationPipeline.length > 0){
-            const products = await Product.aggregate(aggregationPipeline )
-            //console.log('q',products)
+            const products = await Product.aggregate(aggregationPipeline ).skip((page-1)*limit).limit(limit)
+            console.log('q',products)
             res.json(products)
         }else  {
             const result = await Product.find().skip((page-1)*limit).limit(limit)
@@ -104,7 +104,6 @@ productCltr.create = async(req,res) => {
         const product = new Product(body)
         if(product.condition === 'Fair'){
             product.price = (product.price*50)/100
-
         }
         await product.save()
         res.json(product)

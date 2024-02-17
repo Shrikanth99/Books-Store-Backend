@@ -12,8 +12,7 @@ const paymentSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Product',
       },
-      quantity: Number,
-      price: Number
+      quantity: Number
     }
   ],
   totalAmount: Number,
