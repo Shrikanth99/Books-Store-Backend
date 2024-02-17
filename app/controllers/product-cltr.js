@@ -58,7 +58,7 @@ productCltr.list = async(req,res) => {
         }
         //console.log('aP',aggregationPipeline)
         if(aggregationPipeline.length > 0){
-            const products = await Product.aggregate(aggregationPipeline )
+            const products = await Product.aggregate(aggregationPipeline ).skip((page-1)*limit).limit(limit)
             console.log('q',products)
             res.json(products)
         }else  {
