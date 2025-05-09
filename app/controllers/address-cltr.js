@@ -26,7 +26,7 @@ addressCltr.create = async(req,res) =>{
            return  res.status(400).json({errors:[{msg:"Invalid address",path:'invalid address'}]})
         }
         const location = [mapResponse.data.features[0].properties.lon,mapResponse.data.features[0].properties.lat]
-        console.log('ghj',location)
+        // console.log('ghj',location)
         address.location = {type:'Point',coordinates:location}
         await address.save()
         //console.log(address)

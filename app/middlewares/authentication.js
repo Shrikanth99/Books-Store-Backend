@@ -12,7 +12,7 @@ const authenticateUser = (req,res,next) => {
         const tokenData = jwt.verify( token , process.env.JWT_SECRET )
         req.user = tokenData
         next()
-    } catch (e) {
+    } catch (errors) {
         res.status(401).json({ errors: 'authentication failed'})
     }
 }

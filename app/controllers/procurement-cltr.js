@@ -62,24 +62,61 @@ procurementCltr.create = async(req,res) =>{
 
 procurementCltr.list = async(req,res) => {
     try {
-        if(req.user.role === 'user'){
-            console.log(req.user.role)
-            const sellerProc = await Procurement.find({ seller : req.user.id }).populate('products.product')
-            if(!sellerProc.length === 0){
-                res.status(404).json({ error : [{msg : 'Procured Items Not Found'}] })
+        // Extract query parameters with defaults
+        const { 
+            sort = -1, 
+            page = 1, 
+            limit = 8,
+            status = '' 
+        } = req.query;
+
+        // Convert to numbers
+        const pageNumber = parseInt(page);
+        const limitNumber = parseInt(limit);
+        const sortValue = parseInt(sort);
+        
+        // Calculate skip value for pagination
+        const skip = (pageNumber - 1) * limitNumber;
+        
+        // Build query object based on user role
+        let query = {};
+        
+        // Add status filter if provided
+        if (status && status !== 'all') {
+            query.status = status;
+        }
+        
+        // Apply role-based filtering
+        if (req.user.role === 'user') {
+            query.seller = req.user.id;
+        } else if (req.user.role === 'moderator') {
+            query.buyer = req.user.id;
+        }
+        // Admin can see all items, so no additional filter needed
+        
+        // Get total count for pagination info
+        const totalCount = await Procurement.countDocuments(query);
+        
+        // Find procurements with pagination
+        const procurements = await Procurement.find(query)
+            .populate('products.product')
+            .sort({ createdAt: sortValue })
+            .skip(skip)
+            .limit(limitNumber);
+            
+        // Return paginated results with metadata
+        res.json({
+            procurements,
+            pagination: {
+                total: totalCount,
+                page: pageNumber,
+                limit: limitNumber,
+                pages: Math.ceil(totalCount / limitNumber)
             }
-            res.json(sellerProc)
-        }else if(req.user.role === 'moderator'){
-            const procurement = await Procurement.find({ buyer : req.user.id }).populate('products.product')
-            res.json(procurement)
-        }
-        else{
-            const items = await Procurement.find().populate('products.product')
-            res.json(items)
-        }
-        //console.log('pc',procurement)
+        });
     } catch (e) {
-        res.status(500).json(e)
+        console.error('Error in procurement list:', e);
+        res.status(500).json({ error: e.message });
     }
 }
 

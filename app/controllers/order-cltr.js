@@ -55,22 +55,58 @@ orderCltr.list = async(req,res) => {
     }
 }
 
-    orderCltr.listAll = async(req,res) => {
-        const {sort} = req.query
-        try {
-            if(sort){
-                const order = await Order.find().populate('orderItem.product').sort({createdAt:Number(sort)})
-                res.json(order)
-            }else {
-                const order = await Order.find().populate('orderItem.product')
-                res.json(order)
-            }
-            
-            // console.log('ao',order)
-        } catch (e) {
-            res.status(500).json(e)
+orderCltr.listAll = async(req, res) => {
+    // Extract query parameters with defaults
+    const { 
+        sort = -1, 
+        page = 1, 
+        limit = 8,
+        status = '' 
+    } = req.query;
+
+    // Convert to numbers
+    const pageNumber = parseInt(page);
+    const limitNumber = parseInt(limit);
+    const sortValue = parseInt(sort);
+    
+    // Calculate skip value for pagination
+    const skip = (pageNumber - 1) * limitNumber;
+    
+    try {
+        // Build query object
+        const query = {};
+        
+        // Add status filter if provided
+        if (status && status !== 'all') {
+            query.orderStatus = status;
         }
+        
+        // Get total count for pagination info
+        const totalCount = await Order.countDocuments(query);
+        
+        // Find orders with pagination
+        const orders = await Order.find(query)
+            .populate('orderItem.product')
+            .populate('user', 'name email')
+            .sort({ createdAt: sortValue })
+            .skip(skip)
+            .limit(limitNumber);
+        
+        // Return paginated results with metadata
+        res.json({
+            orders,
+            pagination: {
+                total: totalCount,
+                page: pageNumber,
+                limit: limitNumber,
+                pages: Math.ceil(totalCount / limitNumber)
+            }
+        });
+    } catch (e) {
+        console.error('Error in listAll:', e);
+        res.status(500).json({ error: e.message });
     }
+}
 
 orderCltr.removeOrder = async(req,res) =>{
     try{

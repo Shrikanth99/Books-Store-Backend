@@ -1,14 +1,9 @@
-
 const reviewValidationSchema = {
     userId : {
-        isMongoIdisMongoId : {
+        isMongoId : {
             errorMessage:"should be a valid mongoId"
         }
-        // custom : {
-        //     options : (value) => {
 
-        //     }
-        // }
     },
     rating : {
         notEmpty : {
